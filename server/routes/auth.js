@@ -7,7 +7,7 @@ const router = express.Router();
 module.exports = router;
 
 router.post('/register', (req, res) => {
-  console.log("REGISTER")
+  console.log("REGISTER ", req.body)
   if (!req || !req.body || !req.body.username || !req.body.password) {
     res.status(400).send({ message: 'Username and Password required' });
   }

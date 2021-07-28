@@ -9,6 +9,7 @@ const userSchema = new Schema({
   username: { type: String, lowercase: true, required: true, unique: true, immutable: true },
   username_case: { type: String, required: true },
   password: { type: String, required: true },
+  role: {type: String},
   profile_pic: { type: String },
   first_name: { type: String, maxlength: 20 },
   last_name: { type: String, maxlength: 20 },
