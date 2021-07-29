@@ -4,6 +4,7 @@ const { Restaurant } = require('../database/schemas');
 
 const { User } = require('../database/schemas');
 
+var ObjectId = require('mongodb').ObjectID;
 
 const router = express.Router();
 
@@ -81,6 +82,23 @@ router.get('/getRestaurants', (req, res) =>{
           res.send({ message: 'Restaurants retrieved successfully', restaurants });
         }
       });
+})
+
+
+router.post('/addMenu', (req, res) =>{
+ 
+  var menuItem = { itemName: req.body.itemName,price: req.body.price };
+   Restaurant.findOneAndUpdate(
+   { _id: ObjectId(req.body.id) },
+   { $push: { menu: menuItem  } },{new: true}, 
+   function (error, success) {
+        if (error) {
+          res.send({ message: 'Error', error })
+        } else {
+            res.send({ message: 'Menu Added successfully', success })
+        }
+    });
+
 })
 
 router.get('/getRestaurantsByLocation', (req, res) =>{
