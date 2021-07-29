@@ -7,7 +7,7 @@ const { Schema } = mongoose;
 
 const userSchema = new Schema({
   username: { type: String, lowercase: true, required: true, unique: true, immutable: true },
-  username_case: { type: String, required: true },
+  // username_case: { type: String, required: true },
   password: { type: String, required: true },
   role: {type: String},
   profile_pic: { type: String },
@@ -16,6 +16,7 @@ const userSchema = new Schema({
   bio: { type: String, maxlength: 240 },
   created_at: { type: Date, default: Date.now, immutable: true },
   updated_at: { type: Date },
+  restaurantID: {type: mongoose.Schema.ObjectId, ref: 'restaurants'}
 }, { versionKey: false });
 
 if (process.env.NODE_ENV !== 'test') {

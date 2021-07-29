@@ -2,6 +2,9 @@ const express  = require('express');
 const passport = require('passport');
 const { Restaurant } = require('../database/schemas');
 
+const { User } = require('../database/schemas');
+
+
 const router = express.Router();
 
 module.exports = router;
@@ -11,16 +14,72 @@ router.post('/addRestaurant', (req, res) => {
 //     res.status(400).send({ message: 'Username and Password required' });
 //   }
   console.log("** ", req.body)
-  const newRestaurant = Restaurant(req.body);
+  
+  console.log("REGISTER ", req.body)
+ 
 
-    newRestaurant.save((err, savedUser) => {
-        if (err || !savedUser) {
-          res.status(400).send({ message: 'Adding new Restaurant Failed', err });
-        } else {
-            console.log("Success")
-           res.send({ message: 'Restaurant Added successfully'});
-        }
-    });
+
+         const newRestaurant = Restaurant(req.body);
+
+          newRestaurant.save((err, savedUser) => {
+              if (err || !savedUser) {
+                res.status(400).send({ message: 'Adding new Restaurant Failed', err });
+              } else {
+                  console.log("Success")
+                 //res.send({ message: 'Restaurant Added successfully'});
+                 if (!req || !req.body || !req.body.username || !req.body.password) {
+                  res.status(400).send({ message: 'Username and Password required' });
+                }
+              
+                req.body.username_case = req.body.username;
+                req.body.username = req.body.username.toLowerCase();
+              
+                const { username } = req.body;
+                console.log("LL ",savedUser )
+                const newUser = User({
+                  username:req.body.username,
+                  password: req.body.password,
+                  restaurantID: savedUser._id
+                });
+              
+                User.find({ username }, (err, users) => {
+                  if (err) {
+                    res.status(400).send({ message: 'Create user failed', err });
+                  }
+                  if (users[0]) {
+                    res.status(400).send({ message: 'Username exists' });
+                  }
+              
+                  newUser.hashPassword().then(() => {
+                    newUser.save((err, savedUser) => {
+                      if (err || !savedUser) {
+                        res.status(400).send({ message: 'Create user failed', err });
+                      } else {
+                        User
+                        .find({_id:savedUser._id})
+                        .populate('restaurantID')
+                        .exec(function(err, users) {
+                          res.send({ message: 'User created successfully', users
+                        }) 
+                      });
+                    //   async function getUsers() {
+
+                    //     var user = await User.findOne( { _id:savedUser._id } );
+                    
+                    //    const u = await user.populate( 'restaurantID' ).execPopulate(); // Works as expected
+                    //     console.log("USS ", u)
+                    // } 
+
+                    // getUsers();
+              
+                      }
+                    });
+                  });
+                   
+                });
+              }
+          });
+ 
 });
 
 router.get('/getRestaurants', (req, res) =>{
