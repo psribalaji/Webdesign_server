@@ -62,17 +62,8 @@ router.post('/addRestaurant', (req, res) => {
                           res.send({ message: 'User created successfully', users
                         }) 
                       });
-                    //   async function getUsers() {
-
-                    //     var user = await User.findOne( { _id:savedUser._id } );
-                    
-                    //    const u = await user.populate( 'restaurantID' ).execPopulate(); // Works as expected
-                    //     console.log("USS ", u)
-                    // } 
-
-                    // getUsers();
-              
-                      }
+                 
+                    }
                     });
                   });
                    

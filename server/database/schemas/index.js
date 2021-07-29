@@ -1,11 +1,12 @@
 const Session = require('./Session');
 const Todo = require('./Todo');
-const Restaurant = require('./Restaurants')
 const User = require('./User');
+const Restaurant = require('./Restaurants')
 
 module.exports = {
+  Restaurant,
   Session,
   User,
-  Todo,
-  Restaurant
+  Todo
+  
 };

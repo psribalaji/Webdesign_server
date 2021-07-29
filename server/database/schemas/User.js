@@ -16,7 +16,7 @@ const userSchema = new Schema({
   bio: { type: String, maxlength: 240 },
   created_at: { type: Date, default: Date.now, immutable: true },
   updated_at: { type: Date },
-  restaurantID: {type: mongoose.Schema.ObjectId, ref: 'restaurants'}
+  restaurantID: {type: mongoose.Schema.ObjectId, ref: 'Restaurant'}
 }, { versionKey: false });
 
 if (process.env.NODE_ENV !== 'test') {

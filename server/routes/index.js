@@ -1,10 +1,11 @@
 const express = require('express');
 
 const auth         = require('./auth');
+const restaurant   = require('./restaurant')
+
 const user         = require('./user');
 const users        = require('./users');
 const todos        = require('./todos');
-const restaurant   = require('./restaurant')
 
 const router = express.Router();
 
