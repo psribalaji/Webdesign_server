@@ -87,17 +87,76 @@ router.get('/getRestaurants', (req, res) =>{
 
 router.post('/addMenu', (req, res) =>{
  
+  console.log("Add menu caled")
+  //console.log("rr" , req)
   var menuItem = { itemName: req.body.itemName,price: req.body.price };
    Restaurant.findOneAndUpdate(
-   { _id: ObjectId(req.body.id) },
+   { _id: ObjectId(req.user.restaurantID) },
    { $push: { menu: menuItem  } },{new: true}, 
    function (error, success) {
         if (error) {
           res.send({ message: 'Error', error })
         } else {
+            console.log("Add menu ", success)
             res.send({ message: 'Menu Added successfully', success })
         }
     });
+
+})
+
+router.patch('/updateMenu', (req, res) =>{
+ 
+  console.log("Update menu caled")
+  console.log("rr" , req.user.restaurantID)
+  console.log("mm", req.body)
+  var menuItem = { itemName: req.body.itemName,price: req.body.price };
+   Restaurant.findByIdAndUpdate(
+   { 'menu._id': ObjectId(req.body._id) },
+   { $set: menuItem }, 
+   function (error, success) {
+        if (error) {
+          res.send({ message: 'Error', error })
+        } else {
+            console.log("Add menu ", success)
+            res.send({ message: 'Menu Added successfully', success })
+        }
+    });
+
+})
+
+router.post('/deleteMenu', (req, res) =>{
+ 
+  console.log("Delete menu caled")
+  //console.log("rr" , req)
+  console.log("menu id", req.body._id)
+  console.log("rest id", req.user.restaurantID)
+
+  
+  Restaurant.findOneAndUpdate({_id: ObjectId(req.user.restaurantID)}, {$pull: {menu: {_id: ObjectId(req.body._id)}}},{new: true}, function(err, data){
+    if (err) {
+      res.send({ message: 'Error', err })
+    } else {
+      console.log("Delete Menu ", data)
+        res.send({ message: 'Deleted successfully', data })
+    }
+  });
+
+
+
+})
+
+router.get('/getMenu', (req, res) =>{
+  console.log("Menu called")
+  // console.log(req)
+
+  console.log(req.user.restaurantID)
+  Restaurant.find({_id: req.user.restaurantID}, (err, restaurants) => {
+    if (err) {
+      res.status(400).send({ message: 'Get Menus failed', err });
+    } else {
+      res.send({ message: 'Menus retrieved successfully', restaurants });
+    }
+  });
 
 })
 
