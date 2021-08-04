@@ -160,6 +160,21 @@ router.get('/getMenu', (req, res) =>{
 
 })
 
+router.get('/getMenu/:id', (req, res) =>{
+  console.log("Menu called")
+  // console.log(req)
+
+  console.log(req.params.id)
+  Restaurant.find({_id: req.params.id}, (err, restaurants) => {
+    if (err) {
+      res.status(400).send({ message: 'Get Menus failed', err });
+    } else {
+      res.send({ message: 'Menus retrieved successfully', restaurants });
+    }
+  });
+
+})
+
 router.get('/getRestaurantsByLocation', (req, res) =>{
     Restaurant.find({location: req.body.location }, (err, restaurants) => {
         if (err) {
@@ -170,34 +185,4 @@ router.get('/getRestaurantsByLocation', (req, res) =>{
       });
 })
 
-router.post('/login', (req, res, next) => {
-  req.body.username = req.body.username.toLowerCase();
 
-  passport.authenticate('local', (err, user, info) => {
-    if (err) {
-      return next(err);
-    }
-    if (!user) {
-      return res.status(401).send(info);
-    }
-
-    req.login(user, err => {
-      if (err) {
-        res.status(401).send({ message: 'Login failed', err });
-      }
-      res.send({ message: 'Logged in successfully', user: user.hidePassword() });
-    });
-
-  })(req, res, next);
-});
-
-router.post('/logout', (req, res) => {
-  req.session.destroy(err => {
-    if (err) {
-      res.status(400).send({ message: 'Logout failed', err });
-    }
-    req.sessionID = null;
-    req.logout();
-    res.send({ message: 'Logged out successfully' });
-  });
-});
