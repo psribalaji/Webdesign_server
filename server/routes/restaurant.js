@@ -186,4 +186,32 @@ router.get('/getRestaurantsByLocation', (req, res) =>{
       });
 })
 
+router.get('/getRestaurantInfo/:id', (req,res) => {
+  console.log(req);
+  Restaurant.find({_id: req.params.id }, (err, restaurants) => {
+    if (err) {
+      res.status(400).send({ message: 'Get Restaurant Details failed', err });
+      console.log("error msg",  req.user.restaurantID);
+    } else {
+      res.send({ message: 'Restaurants Details retrieved successfully', restaurants });
+    }
+  });
+});
+
+router.put('/restaurantInfo', (req, res) => {
+  req.body.updated_at = Date.now();
+  console.log(req.user.restaurantID);
+  console.log("** ",req.body)
+  Restaurant.findByIdAndUpdate({ _id: req.user.restaurantID }, req.body, { new: true }, (err, restaurants) => {
+    if (err) {
+      res.status(400).send({ message: 'Update Restaurants failed', err });
+
+      // res.status(400).send({ err, message: 'Error updating user' });
+    }
+    // res.status(200).send({ message: 'Restaurant successfully updated' });
+    res.send({ message: 'Restaurant updated successfully', restaurants });
+
+  });
+});
+
 
