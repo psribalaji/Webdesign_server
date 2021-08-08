@@ -6,6 +6,8 @@ const restaurant   = require('./restaurant')
 const user         = require('./user');
 const users        = require('./users');
 const todos        = require('./todos');
+const order        = require('./order');
+
 
 const router = express.Router();
 
@@ -14,6 +16,8 @@ router.use('/api/user', user);
 router.use('/api/users', users);
 router.use('/api/todos', todos);
 router.use('/api/res', restaurant)
+router.use('/api/order', order)
+
 
 
 router.get('/api/tags', (req, res) => {

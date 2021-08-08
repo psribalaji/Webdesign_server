@@ -54,6 +54,7 @@ router.post('/addRestaurant', (req, res) => {
                   newUser.hashPassword().then(() => {
                     newUser.save((err, savedUser) => {
                       if (err || !savedUser) {
+                        console.log("err ", err)
                         res.status(400).send({ message: 'Create user failed', err });
                       } else {
                         User
