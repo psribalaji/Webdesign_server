@@ -4,11 +4,26 @@ const { Restaurant } = require('../database/schemas');
 
 const { User } = require('../database/schemas');
 
+const multer = require('multer');
+
 var ObjectId = require('mongodb').ObjectID;
 
 const router = express.Router();
 
 module.exports = router;
+
+
+//Multer Function to store images in uploads folder
+var fileStorageEngine = multer.diskStorage({
+  destination: function(req, file, cb){
+    cb(null, './uploads')
+  },
+  filename: function(req, file, cb){
+    cb(null, Date.now() + '--'+ file.originalname);
+  }
+});
+
+const upload = multer({storage: fileStorageEngine});
 
 router.post('/addRestaurant', (req, res) => {
 //   if (!req || !req.body || !req.body.username || !req.body.password) {
@@ -184,7 +199,8 @@ router.get('/getRestaurantsByLocation', (req, res) =>{
           res.send({ message: 'Restaurants retrieved successfully', restaurants });
         }
       });
-})
+});
+
 
 router.get('/getRestaurantInfo/:id', (req,res) => {
   console.log(req);
@@ -205,10 +221,7 @@ router.put('/restaurantInfo', (req, res) => {
   Restaurant.findByIdAndUpdate({ _id: req.user.restaurantID }, req.body, { new: true }, (err, restaurants) => {
     if (err) {
       res.status(400).send({ message: 'Update Restaurants failed', err });
-
-      // res.status(400).send({ err, message: 'Error updating user' });
     }
-    // res.status(200).send({ message: 'Restaurant successfully updated' });
     res.send({ message: 'Restaurant updated successfully', restaurants });
 
   });
