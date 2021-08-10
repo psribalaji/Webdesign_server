@@ -4,11 +4,53 @@ const { Restaurant } = require('../database/schemas')
 
 const { User } = require('../database/schemas')
 
+const multer = require('multer')
+
 var ObjectId = require('mongodb').ObjectID
 
 const router = express.Router()
 
 module.exports = router
+
+//Multer Function to store images in uploads folder
+var fileStorageEngine = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, './uploads')
+  },
+  filename: function (req, file, cb) {
+    cb(null, Date.now() + '--' + file.originalname)
+  },
+})
+
+const upload = multer({ storage: fileStorageEngine })
+
+router.post('/test', upload.single('profilePic'), (req, res, next) => {
+  const url = req.protocol + '://' + req.get('host')
+  console.log('ss ', req.body)
+  console.log('ssdd ', req)
+
+  const newRestaurant = new Restaurant({
+    address: '1 Hacker Street',
+    restaurantName: 'Facebook',
+    pincode: '02120',
+    location: 'California',
+    profilePic: req.body.profilePic,
+  })
+  newRestaurant
+    .save()
+    .then((result) => {
+      res.status(201).json({
+        message: 'Success',
+        restaurants: {
+          profilePic: result.profilePic,
+        },
+      })
+    })
+    .catch((err) => {
+      console.log('Err ', err)
+      res.send(err)
+    })
+})
 
 router.post('/addRestaurant', (req, res) => {
   //   if (!req || !req.body || !req.body.username || !req.body.password) {
@@ -164,12 +206,59 @@ router.get('/getMenu/:id', (req, res) => {
   })
 })
 
-router.get('/getRestaurantsByLocation', (req, res) => {
-  Restaurant.find({ location: req.body.location }, (err, restaurants) => {
+router.get('/getRestaurantsByLocation/:location', (req, res) => {
+  Restaurant.find({ location: req.params.location }, (err, restaurants) => {
     if (err) {
       res.status(400).send({ message: 'Get Restaurants failed', err })
     } else {
       res.send({ message: 'Restaurants retrieved successfully', restaurants })
     }
   })
+})
+
+router.get('/getRestaurantsByName/:name', (req, res) => {
+  Restaurant.find(
+    {
+      restaurantName: {
+        $regex: new RegExp(req.params.name, 'i'),
+      },
+    },
+    (err, restaurants) => {
+      if (err) {
+        res.status(400).send({ message: 'Get Restaurants failed', err })
+      } else {
+        res.send({ message: 'Restaurants retrieved successfully', restaurants })
+      }
+    }
+  )
+})
+
+router.get('/getRestaurantsByLocation', (req, res) => {
+  Restaurant.find({ location: req.body.location }, (err, restaurants) => {
+    if (err) {
+      res.status(400).send({ message: 'Get Restaurants failed', err })
+    } else {
+      res.send({
+        message: 'Restaurants Details retrieved successfully',
+        restaurants,
+      })
+    }
+  })
+})
+
+router.put('/restaurantInfo', (req, res) => {
+  req.body.updated_at = Date.now()
+  console.log(req.user.restaurantID)
+  console.log('** ', req.body)
+  Restaurant.findByIdAndUpdate(
+    { _id: req.user.restaurantID },
+    req.body,
+    { new: true },
+    (err, restaurants) => {
+      if (err) {
+        res.status(400).send({ message: 'Update Restaurants failed', err })
+      }
+      res.send({ message: 'Restaurant updated successfully', restaurants })
+    }
+  )
 })
