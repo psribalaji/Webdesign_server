@@ -25,6 +25,36 @@ var fileStorageEngine = multer.diskStorage({
 
 const upload = multer({storage: fileStorageEngine});
 
+
+router.post('/test', upload.single('profilePic') ,(req, res, next) =>{
+
+  const url = req.protocol + '://' + req.get('host')
+  console.log('ss ',req.body)
+  console.log('ssdd ',req)
+
+
+    const newRestaurant = new Restaurant({
+      address: "1 Hacker Street",
+      restaurantName: "Facebook",
+      pincode : "02120",
+      location: "California",
+      profilePic: req.body.profilePic
+    });
+    newRestaurant.save().then(result =>{
+      res.status(201).json({
+        message:"Success",
+        restaurants:{
+
+          profilePic: result.profilePic
+        }
+      })
+    }).catch(err =>{
+      console.log("Err ",err);
+      res.send(err)
+    })
+
+})
+
 router.post('/addRestaurant', (req, res) => {
 //   if (!req || !req.body || !req.body.username || !req.body.password) {
 //     res.status(400).send({ message: 'Username and Password required' });
@@ -191,8 +221,8 @@ router.get('/getMenu/:id', (req, res) =>{
 
 })
 
-router.get('/getRestaurantsByLocation', (req, res) =>{
-    Restaurant.find({location: req.body.location }, (err, restaurants) => {
+router.get('/getRestaurantsByLocation/:location', (req, res) =>{
+    Restaurant.find({location: req.params.location }, (err, restaurants) => {
         if (err) {
           res.status(400).send({ message: 'Get Restaurants failed', err });
         } else {
