@@ -172,9 +172,11 @@ router.patch('/updateMenu', (req, res) => {
   console.log('rr', req.user.restaurantID)
   console.log('mm', req.body)
   var menuItem = { itemName: req.body.itemName, price: req.body.price }
-  Restaurant.findByIdAndUpdate(
-    { 'menu._id': ObjectId(req.body._id) },
-    { $set: menuItem },
+  Restaurant.findOneAndUpdate({'menu._id': ObjectId(req.body._id)}, 
+  {"$set" : {
+    'menu.$.itemName': req.body.itemName,
+    'menu.$.price': req.body.price
+  }},
     function (error, success) {
       if (error) {
         res.send({ message: 'Error', error })
