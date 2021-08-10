@@ -17,6 +17,7 @@ router.use('/api/users', users);
 router.use('/api/todos', todos);
 router.use('/api/res', restaurant)
 router.use('/api/order', order)
+router.use('/public', express.static('public'));
 
 
 

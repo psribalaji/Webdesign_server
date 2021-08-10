@@ -9,16 +9,49 @@ const multer = require('multer')
 var ObjectId = require('mongodb').ObjectID
 
 const router = express.Router()
+const { v4: uuidv4 } = require('uuid')
 
 module.exports = router
 
-//Multer Function to store images in uploads folder
-var fileStorageEngine = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, './uploads')
+module.exports = router
+
+// //Multer Function to store images in uploads folder
+// var fileStorageEngine = multer.diskStorage({
+//   destination: function(req, file, cb){
+//     cb(null, './uploads')
+//   },
+//   filename: function(req, file, cb){
+//     cb(null, Date.now() + '--'+ file.originalname);
+//   }
+// });
+
+// const upload = multer({storage: fileStorageEngine});
+
+const DIR = './public/'
+
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, DIR)
   },
-  filename: function (req, file, cb) {
-    cb(null, Date.now() + '--' + file.originalname)
+  filename: (req, file, cb) => {
+    const fileName = file.originalname.toLowerCase().split(' ').join('-')
+    cb(null, uuidv4() + '-' + fileName)
+  },
+})
+
+var upload = multer({
+  storage: storage,
+  fileFilter: (req, file, cb) => {
+    if (
+      file.mimetype == 'image/png' ||
+      file.mimetype == 'image/jpg' ||
+      file.mimetype == 'image/jpeg'
+    ) {
+      cb(null, true)
+    } else {
+      cb(null, false)
+      return cb(new Error('Only .png, .jpg and .jpeg format allowed!'))
+    }
   },
 })
 
@@ -34,7 +67,7 @@ router.post('/test', upload.single('profilePic'), (req, res, next) => {
     restaurantName: 'Facebook',
     pincode: '02120',
     location: 'California',
-    profilePic: req.body.profilePic,
+    profilePic: url + '/public/' + req.file.filename,
   })
   newRestaurant
     .save()
@@ -52,15 +85,25 @@ router.post('/test', upload.single('profilePic'), (req, res, next) => {
     })
 })
 
-router.post('/addRestaurant', (req, res) => {
+router.post('/addRestaurant', upload.single('profilePic'), (req, res) => {
   //   if (!req || !req.body || !req.body.username || !req.body.password) {
   //     res.status(400).send({ message: 'Username and Password required' });
   //   }
   console.log('** ', req.body)
+  const url = req.protocol + '://' + req.get('host')
+
+  console.log('REGISTER ', req.body)
+  console.log('File ', req.file)
 
   console.log('REGISTER ', req.body)
 
-  const newRestaurant = Restaurant(req.body)
+  const newRestaurant = Restaurant({
+    address: req.body.address,
+    restaurantName: req.body.restaurantName,
+    pincode: req.body.pincode,
+    location: req.body.location,
+    profilePic: url + '/public/' + req.file.filename,
+  })
 
   newRestaurant.save((err, savedUser) => {
     if (err || !savedUser) {
