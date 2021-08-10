@@ -34,14 +34,19 @@ const storage = multer.diskStorage({
         cb(null, DIR);
     },
     filename: (req, file, cb) => {
-        const fileName = file.originalname.toLowerCase().split(' ').join('-');
+        const fileName = file.originalname.split(' ').join('-');
         cb(null, uuidv4() + '-' + fileName)
     }
 });
 
 var upload = multer({
+
     storage: storage,
     fileFilter: (req, file, cb) => {
+      // console.log('ff ', req)
+      console.log('ff 11', file)
+      console.log("MUUU")
+
         if (file.mimetype == "image/png" || file.mimetype == "image/jpg" || file.mimetype == "image/jpeg") {
             cb(null, true);
         } else {
@@ -55,7 +60,7 @@ router.post('/test', upload.single('profilePic') ,(req, res, next) =>{
 
   const url = req.protocol + '://' + req.get('host')
   console.log('ss ',req.body)
-  console.log('ssdd ',req)
+  // console.log('ssdd ',req)
 
 
     const newRestaurant = new Restaurant({
@@ -82,15 +87,15 @@ router.post('/test', upload.single('profilePic') ,(req, res, next) =>{
 
 
 
-router.post('/addRestaurant', upload.single('profilePic'), (req, res) => {
+router.post('/addRestaurant', upload.single('profilePic'), (req, res, next) => {
 //   if (!req || !req.body || !req.body.username || !req.body.password) {
 //     res.status(400).send({ message: 'Username and Password required' });
 //   }
-  console.log("** ", req.body)
-  const url = req.protocol + '://' + req.get('host')
+  // console.log("** ", req)
+  const url = req.protocol + '://localhost:3000'
 
-  console.log("REGISTER ", req.body)
-  console.log("File ", req.file)
+  //console.log("REGISTER ", req.body)
+  // console.log("File ", req.file)
 
 
          const newRestaurant = Restaurant({
@@ -111,7 +116,7 @@ router.post('/addRestaurant', upload.single('profilePic'), (req, res) => {
                   res.status(400).send({ message: 'Username and Password required' });
                 }
               
-                req.body.username_case = req.body.username;
+                // req.body.username_case = req.body.username;
                 req.body.username = req.body.username.toLowerCase();
               
                 const { username } = req.body;
@@ -136,10 +141,14 @@ router.post('/addRestaurant', upload.single('profilePic'), (req, res) => {
                         console.log("err ", err)
                         res.status(400).send({ message: 'Create user failed', err });
                       } else {
+                        // console.log("Succcc ")
+
                         User
                         .find({_id:savedUser._id})
                         .populate('restaurantID')
                         .exec(function(err, users) {
+                          console.log("Succcc11 ", users)
+
                           res.send({ message: 'User created successfully', users
                         }) 
                       });
@@ -188,7 +197,7 @@ router.patch('/updateMenu', (req, res) =>{
  
   console.log("Update menu caled")
   console.log("rr" , req.user.restaurantID)
-  console.log("mm", req.body)
+  // console.log("mm", req.body)
   var menuItem = { itemName: req.body.itemName,price: req.body.price };
    Restaurant.findByIdAndUpdate(
    { 'menu._id': ObjectId(req.body._id) },

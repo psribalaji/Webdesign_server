@@ -49,6 +49,7 @@ router.get('/userOrderDetails/:id', (req,res) =>{
 router.get('/restaurantOrderDetails/:id', (req,res) =>{
   // console.log('req ',req)
 
+  console.log("Rest order detaila ", req.params.id)
   Order
   .find({restaurant_id:req.params.id})
   .populate('user_id')
